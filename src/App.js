@@ -1,11 +1,38 @@
 import React from 'react';
+import './index.css';
 import NavBar from './components/NavBar';
 import Container from '@material-ui/core/Container';
 import Sidebar from './components/Sidebar';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
+import Meals from './components/Meals';
+import { withStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
-class App extends React.Component {
+const Styles = theme => ({
+  root: {
+    [theme.breakpoints.up('sm')]: {
+      display: 'flex',
+    },
+  },
+  content: {
+      [theme.breakpoints.up('sm')]: {
+        marginTop: '100px',
+      },
+      flexGrow: 1,
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+  },
+  contentShift: {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+  },
+});
+
+
+class HigherOrderComponent extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -20,31 +47,22 @@ class App extends React.Component {
     }
     else {
       this.setState({
-        showSidebar: false,
-      });
+      showSidebar: false,
+    });
     }
   }
   render() {
+    const { classes } = this.props;
   return (
-    <div>
+    <div className={classes.root}>
       <Sidebar visible={this.state.showSidebar}/>
       <Container maxWidth="lg">
         <NavBar buttonOnclick={this.changeSidebarVisibility}/>
-        <Grid style={{marginTop: '100px',}} container spacing={3}>
-          <Grid item sm={4}>
-            <Paper>123</Paper>
-          </Grid>
-          <Grid item sm={4}>
-            <Paper>123</Paper>
-          </Grid>
-          <Grid item sm={4}>
-            <Paper>123</Paper>
-          </Grid>
-        </Grid>
+        <Meals hideFavIcons={this.state.showSidebar} className={clsx(classes.content,{[classes.contentShift]: this.state.showSidebar,})}/>
       </Container>
     </div>
   );
 }
 }
 
-export default App;
+export default withStyles(Styles)(HigherOrderComponent);

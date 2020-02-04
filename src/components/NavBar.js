@@ -42,13 +42,6 @@ const Styles = makeStyles(theme => ({
             marginLeft: theme.spacing(8),
         },
     },
-    favoriteIcon: {
-        position: "absolute",
-        right: "20%",
-        [theme.breakpoints.up('sm')]: {
-            right: '15px',
-        },
-    },
     title: {
         flexGrow: 1,
         display: 'none',
@@ -98,7 +91,7 @@ const NavBar = (props) => {
         return (
             <div className={classes.root}>
                 <AppBar className={classes.bar} position='fixed'>
-                    <Toolbar>
+                    <Toolbar style={{justifyContent: 'space-between'}}>
                         <IconButton className={classes.menuIcon} edge="start" color="inherit" onClick={onclick}>
                             <MenuIcon/>
                         </IconButton>
@@ -116,7 +109,7 @@ const NavBar = (props) => {
                     </div>
                     <Button className={classes.btn}>
                         <p className={classes.btnText}>FAVOURITES</p>
-                        <FavoriteBorderIcon className={classes.favoriteIcon}/>
+                        <FavoriteBorderIcon/>
                     </Button>
                     </Toolbar>
                 </AppBar>
