@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { Component } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import { Toolbar, IconButton, InputBase, Button } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { fade } from '@material-ui/core/styles';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import { withStyles } from '@material-ui/core/styles';
 
-const Styles = makeStyles(theme => ({
+const Styles = theme => ({
     root: {
         flexGrow: 1,
     },
@@ -81,18 +82,29 @@ const Styles = makeStyles(theme => ({
             display: 'block',
         }
     },
-    }));
+    });
 
-const NavBar = (props) => {
-    const onclick = () => {
-        props.buttonOnclick();
-    };
-    const classes = Styles();
+class NavBar extends Component {
+    constructor(props) {
+        super(props);
+        this.timeout = 0;
+        this.state = {
+            onclick: () => {
+                props.buttonOnclick();
+            },
+            search: (val) => {
+                props.search(val);
+            },
+        };
+    }
+
+    render() {
+    const { classes } = this.props;
         return (
             <div className={classes.root}>
                 <AppBar className={classes.bar} position='fixed'>
                     <Toolbar style={{justifyContent: 'space-between'}}>
-                        <IconButton className={classes.menuIcon} edge="start" color="inherit" onClick={onclick}>
+                        <IconButton className={classes.menuIcon} edge="start" color="inherit" onClick={this.state.onclick}>
                             <MenuIcon/>
                         </IconButton>
                     <div className={classes.search}>
@@ -105,6 +117,7 @@ const NavBar = (props) => {
                         root: classes.inputRoot,
                     }}
                     inputProps={{'aria-label': 'search'}}
+                    onChange={value => this.state.search(value.target.value)}
                     />
                     </div>
                     <Button className={classes.btn}>
@@ -116,5 +129,5 @@ const NavBar = (props) => {
             </div>
         )
     };
-
-export default NavBar;
+}
+export default withStyles(Styles)(NavBar);

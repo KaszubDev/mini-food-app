@@ -37,8 +37,27 @@ class HigherOrderComponent extends React.Component {
     super();
     this.state = {
       showSidebar: false,
+      searchResult: '',
+      areas: [],
+      categories: [],
+      tags: [],
     };
   }
+
+  doSearch = (value) => {
+    this.setState({
+      searchResult: value,
+    });
+  }
+
+  getMealsInfo = (areas, categories, tags) => {
+    this.setState({
+      areas: areas,
+      categories: categories,
+      tags: tags,
+    });
+  }
+
   changeSidebarVisibility = () => {
     if(this.state.showSidebar === false){
     this.setState({
@@ -51,14 +70,16 @@ class HigherOrderComponent extends React.Component {
     });
     }
   }
+
   render() {
     const { classes } = this.props;
+    // console.log(this.state.areas);
   return (
     <div className={classes.root}>
-      <Sidebar visible={this.state.showSidebar}/>
+      <Sidebar visible={this.state.showSidebar} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories}/>
       <Container maxWidth="lg">
-        <NavBar buttonOnclick={this.changeSidebarVisibility}/>
-        <Meals hideFavIcons={this.state.showSidebar} className={clsx(classes.content,{[classes.contentShift]: this.state.showSidebar,})}/>
+        <NavBar search={this.doSearch} buttonOnclick={this.changeSidebarVisibility}/>
+        <Meals callback={this.getMealsInfo} searchResult={this.state.searchResult} hideFavIcons={this.state.showSidebar} className={clsx(classes.content,{[classes.contentShift]: this.state.showSidebar,})}/>
       </Container>
     </div>
   );
