@@ -73,7 +73,7 @@ class HigherOrderComponent extends React.Component {
 
   render() {
     const { classes } = this.props;
-    // console.log(this.state.areas);
+
   return (
     <div className={classes.root}>
       <Sidebar visible={this.state.showSidebar} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories}/>

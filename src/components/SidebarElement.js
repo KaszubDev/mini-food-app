@@ -2,11 +2,12 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import Chip from '@material-ui/core/Chip';
+import SidebarChip from './SidebarChip';
 
 const Styles = makeStyles(theme => ({
     root: {
         margin: '5% 0',
+        width: '98%',
         [theme.breakpoints.up('sm')]: {
             margin: '12% 0',
         },
@@ -15,6 +16,7 @@ const Styles = makeStyles(theme => ({
         minHeight: '7rem',
         minWidth: '30%',
         border: '1px solid #595959',
+        paddingTop: '10px',
         borderRadius: theme.shape.borderRadius,
         [theme.breakpoints.up('sm')]: {
             minHeight: '8rem',
@@ -28,15 +30,17 @@ const Styles = makeStyles(theme => ({
 }));
 const SidebarElement = (props) => {
     const classes = Styles();
-    console.log(props.areas);
-    return (
+    console.log(props.items);
+    return props.items ? (
         <div className={classes.root}>
             <Typography color='textSecondary' variant='h4'>{props.title}</Typography>
             <Container className={classes.container}>
-                <Chip label="Deletable"/>
+                {props.items.map((item,index) =>
+                    <SidebarChip key={index} name={item}/>
+                )}
             </Container>
         </div>
-    )
+    ) : null
 }
 
 export default SidebarElement;

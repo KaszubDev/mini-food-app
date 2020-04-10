@@ -60,15 +60,36 @@ class Meals extends React.Component {
             this.setState({
                 items: items,
             });
-            });
             let Areas = this.state.items.map(item => {
                 return item.strArea;
             });
+            Areas = Areas.filter(Boolean);
             this.setState({
-                areas: Areas,
+                areas: [...new Set(Areas)],
             });
+            let Categories = this.state.items.map(item => {
+                return item.strCategory;
+            });
+            Categories = Categories.filter(Boolean);
+            this.setState({
+                categories: [...new Set(Categories)],
+            });
+            let Tags = this.state.items.map(item => {
+                if (item.strTags != null) {
+                    return item.strTags;
+                }
+            });
+            Tags = Tags.filter(Boolean);
+            Tags = Tags.map(tag => {
+                return tag.split(',');
+            });
+            Tags = [].concat.apply([], Tags);
 
-            this.props.callback(["Poland","Gdansk"],this.state.categories,this.state.tags);
+            this.setState({
+                tags: [...new Set(Tags)],
+            });
+            this.props.callback(this.state.areas,this.state.categories,this.state.tags);
+            });
     }
 
     componentDidUpdate() {
@@ -86,7 +107,35 @@ class Meals extends React.Component {
                         return item;
                     }));
                     this.setState({items: items});
-                    })
+                    let Areas = this.state.items.map(item => {
+                        return item.strArea;
+                    });
+                    Areas = Areas.filter(Boolean);
+                    this.setState({
+                        areas: [...new Set(Areas)],
+                    });
+                    let Categories = this.state.items.map(item => {
+                        return item.strCategory;
+                    });
+                    Categories = Categories.filter(Boolean);
+                    this.setState({
+                        categories: [...new Set(Categories)],
+                    });
+                    let Tags = this.state.items.map(item => {
+                        if (item.strTags != null) {
+                            return item.strTags;
+                        }
+                    });
+                    Tags = Tags.filter(Boolean);
+                    Tags = Tags.map(tag => {
+                        return tag.split(',');
+                    });
+                    Tags = [].concat.apply([], Tags);
+                    this.setState({
+                        tags: [...new Set(Tags)],
+                    });
+                    this.props.callback(this.state.areas,this.state.categories,this.state.tags);
+                })
                 .catch(err => {
                     console.log(err);
                 });
