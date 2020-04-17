@@ -13,11 +13,18 @@ const Styles = makeStyles(theme => ({
 const SidebarChip = (props) => {
     const classes = Styles();
 
-    return (
-        <div className={classes.root}>
-            <Chip label={props.name} onDelete/>
-        </div>
-    )
+    const updateItems = () => {
+        props.updateData(props.name);
+    }
+
+    if (props.name !== ""){
+        return (
+            <div className={classes.root}>
+                <Chip label={props.name} onDelete={updateItems}/>
+            </div>
+        )
+    }
+    else return true;
 }
 
 export default SidebarChip;

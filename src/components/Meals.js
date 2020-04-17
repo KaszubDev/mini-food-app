@@ -9,6 +9,7 @@ import CardContent from '@material-ui/core/CardContent';
 import { withStyles } from '@material-ui/core/styles';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import clsx from 'clsx';
+require('typeface-montserrat');
 
 const API = 'https://www.themealdb.com/api/json/v1/1/search.php';
 
@@ -46,6 +47,7 @@ class Meals extends React.Component {
             areas: [],
             tags: [],
             categories: [],
+            isEmpty: false
         };
     }
 
@@ -95,11 +97,29 @@ class Meals extends React.Component {
     componentDidUpdate() {
         if (this.state.searchResult !== this.props.searchResult){
             this.timeout = setTimeout(() => {
-                if (this.props.searchResult === "") return;
+                if (this.props.searchResult === "") {
+                    this.setState({
+                        searchResult: this.props.searchResult,
+                        areas: [],
+                        categories: [],
+                        tags: [],
+                        items: [],
+                        isEmpty: false
+                    }, () => {
+                        this.props.callback(this.state.areas,this.state.categories,this.state.tags);
+                    });
+                    return true;
+                };
                 this.setState({
                     searchResult: this.props.searchResult,
-                });
-                fetch(`${API}?s=${this.state.searchResult}`)
+                    areas: [],
+                    categories: [],
+                    tags: [],
+                    items: [],
+                    isEmpty: false
+                }, () => {
+                    this.props.callback(this.state.areas,this.state.categories,this.state.tags);
+                    fetch(`${API}?s=${this.state.searchResult}`)
                 .then(results => {
                     return results.json();
                 }).then(data => {
@@ -139,8 +159,31 @@ class Meals extends React.Component {
                 .catch(err => {
                     console.log(err);
                 });
+                });
+                this.timer = setTimeout(() => {
+                    if (this.state.items.length === 0) {
+                        this.setState({
+                            isEmpty: true
+                        })
+                    }
+                }, 1500);
                 }
               , 1000);
+        }
+        if ((this.props.areas.length !== 0) && (this.state.areas !== this.props.areas)) {
+            this.setState({
+                areas: this.props.areas
+            });
+        }
+        if ((this.props.tags.length !== 0) && (this.state.tags !== this.props.tags)) {
+            this.setState({
+                tags: this.props.tags
+            });
+        }
+        if ((this.props.categories.length !== 0) && (this.state.categories !== this.props.categories)) {
+            this.setState({
+                categories: this.props.categories
+            });
         }
     }
 
@@ -149,13 +192,19 @@ class Meals extends React.Component {
         return (
             <div>
             <InfiniteScroll
-                dataLength={this.state.items.length} //This is important field to render the next data
-                hasMore={false}
-                loader={<h4>Loading...</h4>}
-                className={classes.scroll}
-                >
-                <Grid container spacing={3} justify="center">
-                {this.state.items.map(pic =>
+            dataLength={this.state.items.length} //This is important field to render the next data
+            hasMore={false}
+            loader={<h4>Loading...</h4>}
+            className={classes.scroll}
+            >
+            <Grid container spacing={3} justify="center">
+                {this.state.items.map(pic => {
+                    if (pic.strTags) {
+                        var itemTags = pic.strTags.split(',');
+                        var containTags = itemTags.every(tag => this.state.tags.includes(tag));
+                    }
+                    if ( (this.state.areas.includes(pic.strArea) ) && (containTags === true) && (this.state.categories.includes(pic.strCategory)) ) {
+                    return (
                     <Grid key={pic.idMeal} item sm={4}>
                         <Paper style={{boxShadow: 'none', border: '1px solid #ccc'}}>
                             <Card style={{boxShadow: 'none'}}>
@@ -167,8 +216,22 @@ class Meals extends React.Component {
                             </Card>
                         </Paper>
                     </Grid>
-                )}
-                </Grid>
+                    )};
+                })}
+            </Grid>
+            {this.state.items.length === 0 && this.state.searchResult === "" &&
+                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center'}}>
+                    Type something above to see results.
+                </h2>
+            }
+            {
+            this.state.items.length === 0 && this.state.searchResult.length !== 0 && this.state.isEmpty === false &&
+                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center'}}>Loading...</h2>
+            }
+            {
+            this.state.items.length === 0 && this.state.isEmpty === true &&
+                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center'}}>Oops, it looks like we don't have such a dish. Please try entering a different phrase :)</h2>
+            }
             </InfiniteScroll>
             </div>
         );

@@ -52,9 +52,9 @@ const Sidebar = (props) => {
                 <Container className={classes.container} maxWidth="sm">
                     <Typography align='center' color='textPrimary' variant='h2'>Filters</Typography>
                     <Scrollbar style={{ width: "100%", height: "80vh" }}>
-                        <SidebarElement title="Category" items={props.categories}/>
-                        <SidebarElement title="Area" items={props.areas}/>
-                        <SidebarElement title="Tags" items={props.tags}/>
+                        <SidebarElement title="Category" items={props.categories} updateData={props.updateCategories}/>
+                        <SidebarElement title="Area" items={props.areas} updateData={props.updateAreas}/>
+                        <SidebarElement title="Tags" items={props.tags} updateData={props.updateTags}/>
                     </Scrollbar>
                 </Container>
         </div>

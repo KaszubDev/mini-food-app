@@ -56,6 +56,7 @@ class HigherOrderComponent extends React.Component {
       categories: categories,
       tags: tags,
     });
+    console.log("Areas z app.js: "+this.state.areas);
   }
 
   changeSidebarVisibility = () => {
@@ -71,15 +72,54 @@ class HigherOrderComponent extends React.Component {
     }
   }
 
+  updateAreas = (area) => {
+    let arr = this.state.areas;
+    arr = arr.filter((item) => {
+      return item !== area
+    });
+    if (arr[0] == null) arr[0] = ""
+    this.setState({
+      areas: arr
+    }, () => {
+      console.log("Areas z app.js: "+this.state.areas);
+    });
+  }
+
+  updateCategories = (category) => {
+    let arr = this.state.categories;
+    arr = arr.filter((item) => {
+      return item !== category
+    });
+    if (arr[0] == null) arr[0] = ""
+    this.setState({
+      categories: arr
+    }, () => {
+      console.log("Categories z app.js: "+this.state.categories);
+    });
+  }
+
+  updateTags = (tag) => {
+    let arr = this.state.tags;
+    arr = arr.filter((item) => {
+      return item !== tag
+    });
+    if (arr[0] == null) arr[0] = ""
+    this.setState({
+      tags: arr
+    }, () => {
+      console.log("Tags z app.js: "+this.state.tags);
+    });
+  }
+
   render() {
     const { classes } = this.props;
 
   return (
     <div className={classes.root}>
-      <Sidebar visible={this.state.showSidebar} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories}/>
+      <Sidebar visible={this.state.showSidebar} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories} updateAreas={this.updateAreas} updateCategories={this.updateCategories} updateTags={this.updateTags}/>
       <Container maxWidth="lg">
         <NavBar search={this.doSearch} buttonOnclick={this.changeSidebarVisibility}/>
-        <Meals callback={this.getMealsInfo} searchResult={this.state.searchResult} hideFavIcons={this.state.showSidebar} className={clsx(classes.content,{[classes.contentShift]: this.state.showSidebar,})}/>
+        <Meals callback={this.getMealsInfo} searchResult={this.state.searchResult} hideFavIcons={this.state.showSidebar} className={clsx(classes.content,{[classes.contentShift]: this.state.showSidebar,})} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories}/>
       </Container>
     </div>
   );

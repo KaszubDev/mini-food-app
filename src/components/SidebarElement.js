@@ -30,13 +30,13 @@ const Styles = makeStyles(theme => ({
 }));
 const SidebarElement = (props) => {
     const classes = Styles();
-    console.log(props.items);
+
     return props.items ? (
         <div className={classes.root}>
             <Typography color='textSecondary' variant='h4'>{props.title}</Typography>
             <Container className={classes.container}>
                 {props.items.map((item,index) =>
-                    <SidebarChip key={index} name={item}/>
+                    <SidebarChip key={index} name={item} updateData={props.updateData}/>
                 )}
             </Container>
         </div>
