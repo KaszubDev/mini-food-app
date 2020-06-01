@@ -24,6 +24,7 @@ import Scrollbar from "react-scrollbars-custom";
         },
         opened: {
             display: 'block',
+            zIndex: '99',
             visibility: 'visible',
             [theme.breakpoints.up('sm')]: {
                 width: '30%',

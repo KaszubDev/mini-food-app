@@ -4,8 +4,12 @@ import { Toolbar, IconButton, InputBase, Button } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import { fade } from '@material-ui/core/styles';
+import CardMedia from '@material-ui/core/CardMedia';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
 const Styles = theme => ({
     root: {
@@ -24,7 +28,7 @@ const Styles = theme => ({
         },
         marginLeft: 0,
         minHeight: '35px',
-        minWidth: "70%",
+        minWidth: "60%",
         [theme.breakpoints.up('sm')]: {
             marginLeft: theme.spacing(20),
             width: 'auto',
@@ -32,7 +36,7 @@ const Styles = theme => ({
     },
     btn: {
         marginLeft: theme.spacing(2),
-        minWidth: '12%',
+        minWidth: '50px',
         borderRadius: theme.shape.borderRadius,
         border: '1px solid #595959',
         minHeight: '35px',
@@ -41,6 +45,7 @@ const Styles = theme => ({
         },
         [theme.breakpoints.up('sm')]: {
             marginLeft: theme.spacing(8),
+            minWidth: '300px',
         },
     },
     title: {
@@ -76,19 +81,75 @@ const Styles = theme => ({
     },
     btnText: {
         display: 'none',
+        position: "relative",
         margin: 0,
         paddingRight: '20px',
         [theme.breakpoints.up('sm')]: {
             display: 'block',
         }
     },
+    favorites: {
+        position: "relative",
+    },
+    favoritesContainer: {
+        transition: "all .5s",
+        overflow: "hidden",
+        position: "absolute",
+        fontFamily: "Roboto",
+        right: 0,
+        height: 0,
+        backgroundColor: "#fff",
+        marginTop: '10px',
+        width: '350px',
+        [theme.breakpoints.up('sm')]: {
+            marginTop: 0,
+        }
+    },
+    expandedFavorites: {
+        backgroundColor: "#fff",
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        [theme.breakpoints.up('sm')]: {
+            borderBottom: "none",
+        },
+        '&:hover': {
+            backgroundColor: "#fff",
+        }
+    },
+    expandedFavoritesContainer: {
+        height: "200px",
+        border: '1px solid #595959',
+        borderTop: 'none',
+        borderBottomLeftRadius: theme.shape.borderRadius,
+        borderBottomRightRadius: theme.shape.borderRadius,
+    },
+    favoritesList: {
+        listStyle: 'none',
+    },
+    '@global': {
+        '.favoritesRow': {
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '10px',
+        }
+    },
+    favoritesImage: {
+        width: '50px',
+        marginRight: '10px',
+    }
     });
+
 
 class NavBar extends Component {
     constructor(props) {
         super(props);
+        this.componentRef = React.createRef();
+        this.showFavorites = this.showFavorites.bind(this);
         this.timeout = 0;
         this.state = {
+            favoritesWidth: null,
+            active: false,
+            favorites: [],
             onclick: () => {
                 props.buttonOnclick();
             },
@@ -98,8 +159,34 @@ class NavBar extends Component {
         };
     }
 
+    componentDidMount() {
+        const favoritesWidth = this.componentRef.current.clientWidth;
+        this.setState({
+            favoritesWidth: favoritesWidth
+        });
+    }
+
+    showFavorites() {
+        if (this.state.active == false) {
+        this.setState({
+            active: true,
+        });
+    }
+    else {
+        this.setState({
+            active: false,
+        });
+    }
+    }
+
+    searchFavorite(name) {
+        console.log("testyy");
+        this.state.search(name);
+    }
+
     render() {
-    const { classes } = this.props;
+    const { classes } = this.props
+
         return (
             <div className={classes.root}>
                 <AppBar className={classes.bar} position='fixed'>
@@ -120,10 +207,28 @@ class NavBar extends Component {
                     onChange={value => this.state.search(value.target.value)}
                     />
                     </div>
-                    <Button className={classes.btn}>
-                        <p className={classes.btnText}>FAVOURITES</p>
-                        <FavoriteBorderIcon/>
-                    </Button>
+                    <div className={classes.favorites}>
+                        <Button className={clsx(classes.btn, {[classes.expandedFavorites] : this.state.active,})} ref={this.componentRef} onClick={this.showFavorites}>
+                            <p className={classes.btnText}>FAVOURITES</p>
+                            <FavoriteBorderIcon/>
+                        </Button>
+                        <InfiniteScroll
+                            dataLength={localStorage.getItem('favorites').length} //This is important field to render the next data
+                            hasMore={false}
+                            loader={<h4>Loading...</h4>}
+                            className={classes.scroll}
+                        >
+                        <div style={{width: `${this.state.favoritesWidth}px`}} className={clsx(classes.favoritesContainer, {[classes.expandedFavoritesContainer] : this.state.active,})}>
+                            <ul className={classes.favoritesList}>
+                            {JSON.parse(localStorage.getItem('favorites')).map(favorite => {
+                                return (
+                                <li className="favoritesRow" onClick={() => this.searchFavorite(favorite.strMeal)}><CardMedia className={classes.favoritesImage} component="img" title={favorite.strMeal} src={favorite.strMealThumb}/><Typography variant='body1'>{favorite.strMeal}</Typography></li>
+                                );
+                            })}
+                            </ul>
+                        </div>
+                        </InfiniteScroll>
+                    </div>
                     </Toolbar>
                 </AppBar>
             </div>

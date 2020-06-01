@@ -9,6 +9,8 @@ import CardContent from '@material-ui/core/CardContent';
 import { withStyles } from '@material-ui/core/styles';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import clsx from 'clsx';
+import DetailedInformation from './DetailedInformation';
+import { store } from 'react-notifications-component';
 require('typeface-montserrat');
 
 const API = 'https://www.themealdb.com/api/json/v1/1/search.php';
@@ -34,7 +36,12 @@ const Styles = theme => ({
         [theme.breakpoints.up('sm')]: {
             display: 'block',
         },
-    }
+    },
+    meal: {
+        boxShadow: 'none',
+        border: '1px solid #ccc',
+        cursor: 'pointer',
+    },
 });
 
 
@@ -47,8 +54,10 @@ class Meals extends React.Component {
             areas: [],
             tags: [],
             categories: [],
-            isEmpty: false
+            isEmpty: false,
+            favorites: [],
         };
+        this.handleClickOutside = this.handleClickOutside.bind(this);
     }
 
     componentDidMount() {
@@ -92,6 +101,12 @@ class Meals extends React.Component {
             });
             this.props.callback(this.state.areas,this.state.categories,this.state.tags);
             });
+
+            document.addEventListener('mousedown', this.handleClickOutside, false);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
     componentDidUpdate() {
@@ -187,8 +202,77 @@ class Meals extends React.Component {
         }
     }
 
+    hasClass(element, className) {
+        var regex = new RegExp('\\b' + className + '\\b');
+        do {
+          if (regex.exec(element.className)) {
+            return true;
+          }
+          element = element.parentNode;
+        } while (element);
+        return false;
+    }
+
+    handleClickOutside(event) {
+        let elements = document.querySelectorAll(".detailed-information-container");
+
+        if ( !this.hasClass(event.target, "DetailedInfo") ) {
+            for (let i=0 ; i < elements.length; i++) {
+                elements[i].style.display = "none";
+            }
+        }
+    }
+
+    showDetailedInfo = (event,el,id) => {
+        if ( !this.hasClass(event.target, "favoriteBtn") ) {
+            // let elements = document.querySelector()
+
+            const isMobileDevice = () => {
+                return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+            };
+            if (document.getElementById(id) && !isMobileDevice()) {
+                document.getElementById(id).style.display = "flex";
+            }
+            else {
+                document.getElementById(id).style.display = "block";
+            }
+            /* tutej do napisania rozmycie elementów wokół ;)
+            for (let i=0 ; i < elements.length; i++) {
+                elements[i].style.opacity = ".5";
+            }
+            tutej do napisania
+            */
+        }
+    }
+
+    addFavorite = (item) => {
+        let notification = {
+            title: "Success!",
+            message: "Item was added to the favorites",
+            type: "success",
+            insert: "top",
+            animationIn: ["animated", "fadeIn"],
+            animationOut: ["animated", "fadeOut"],
+            dismiss: {
+                duration: 2000,
+                onScreen: true
+            }
+        };
+        let favorites = JSON.parse(localStorage.getItem("favorites"));
+        favorites.push(item);
+        this.setState({
+            favorites: favorites,
+        }, localStorage.setItem('favorites', JSON.stringify(this.state.favorites)));
+        localStorage.setItem('favorites', JSON.stringify(this.state.favorites));
+        store.addNotification({
+            ...notification,
+            container: 'bottom-right'
+        });
+    }
+
     render() {
         const { classes } = this.props;
+
         return (
             <div>
             <InfiniteScroll
@@ -197,7 +281,7 @@ class Meals extends React.Component {
             loader={<h4>Loading...</h4>}
             className={classes.scroll}
             >
-            <Grid container spacing={3} justify="center">
+            <Grid container spacing={8} justify="center" style={{position: 'relative'}}>
                 {this.state.items.map(pic => {
                     if (pic.strTags) {
                         var itemTags = pic.strTags.split(',');
@@ -205,32 +289,39 @@ class Meals extends React.Component {
                     }
                     if ( (this.state.areas.includes(pic.strArea) ) && (containTags === true) && (this.state.categories.includes(pic.strCategory)) ) {
                     return (
-                    <Grid key={pic.idMeal} item sm={4}>
-                        <Paper style={{boxShadow: 'none', border: '1px solid #ccc'}}>
+                    <React.Fragment key={pic.idMeal}>
+                    <Grid item sm={4}>
+                        <Paper onClick={ (event) => this.showDetailedInfo(event,this,pic.idMeal) } className={classes.meal}>
                             <Card style={{boxShadow: 'none'}}>
                                 <CardMedia component="img" title={pic.strMeal} src={pic.strMealThumb}/>
-                                <FavoriteIcon className={clsx(classes.favoriteIcon, {[classes.hideFavIcons] : this.props.hideFavIcons,})}/>
+                                <div className="favoriteBtn">
+                                    <FavoriteIcon className={clsx(classes.favoriteIcon, {[classes.hideFavIcons] : this.props.hideFavIcons,})} onClick={ () => this.addFavorite(pic) }/>
+                                </div>
                                 <CardContent style={{padding: '0 16px 16px', textAlign: 'center'}}>
                                     <Typography style={{padding: '10px'}} color='textPrimary' variant='overline'>{pic.strMeal}</Typography>
                                 </CardContent>
                             </Card>
                         </Paper>
                     </Grid>
+                        <div className="DetailedInfo">
+                            <DetailedInformation setRef={this.setRef} id={pic.idMeal} item={pic}/>
+                        </div>
+                    </React.Fragment>
                     )};
                 })}
             </Grid>
             {this.state.items.length === 0 && this.state.searchResult === "" &&
-                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center'}}>
+                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center', marginTop:'70px'}}>
                     Type something above to see results.
                 </h2>
             }
             {
             this.state.items.length === 0 && this.state.searchResult.length !== 0 && this.state.isEmpty === false &&
-                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center'}}>Loading...</h2>
+                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center', marginTop:'70px'}}>Loading...</h2>
             }
             {
             this.state.items.length === 0 && this.state.isEmpty === true &&
-                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center'}}>Oops, it looks like we don't have such a dish. Please try entering a different phrase :)</h2>
+                <h2 style={{fontFamily: 'Montserrat', textAlign: 'center', marginTop:'70px'}}>Oops, it looks like we don't have such a dish. Please try entering a different phrase :)</h2>
             }
             </InfiniteScroll>
             </div>

@@ -5,6 +5,8 @@ import Container from '@material-ui/core/Container';
 import Sidebar from './components/Sidebar';
 import Meals from './components/Meals';
 import { withStyles } from '@material-ui/core/styles';
+import ReactNotification from 'react-notifications-component';
+import 'react-notifications-component/dist/theme.css';
 import clsx from 'clsx';
 
 const Styles = theme => ({
@@ -116,6 +118,7 @@ class HigherOrderComponent extends React.Component {
 
   return (
     <div className={classes.root}>
+      <ReactNotification />
       <Sidebar visible={this.state.showSidebar} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories} updateAreas={this.updateAreas} updateCategories={this.updateCategories} updateTags={this.updateTags}/>
       <Container maxWidth="lg">
         <NavBar search={this.doSearch} buttonOnclick={this.changeSidebarVisibility}/>
