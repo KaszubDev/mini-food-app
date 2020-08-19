@@ -31,6 +31,11 @@ const Styles = theme => ({
         duration: theme.transitions.duration.enteringScreen,
       }),
   },
+  '@global': {
+    '.notification-container-mobile-bottom': {
+        bottom: '105px',
+    }
+},
 });
 
 
@@ -43,6 +48,7 @@ class HigherOrderComponent extends React.Component {
       areas: [],
       categories: [],
       tags: [],
+      test: null,
     };
   }
 
@@ -58,7 +64,6 @@ class HigherOrderComponent extends React.Component {
       categories: categories,
       tags: tags,
     });
-    console.log("Areas z app.js: "+this.state.areas);
   }
 
   changeSidebarVisibility = () => {
@@ -82,8 +87,6 @@ class HigherOrderComponent extends React.Component {
     if (arr[0] == null) arr[0] = ""
     this.setState({
       areas: arr
-    }, () => {
-      console.log("Areas z app.js: "+this.state.areas);
     });
   }
 
@@ -96,7 +99,7 @@ class HigherOrderComponent extends React.Component {
     this.setState({
       categories: arr
     }, () => {
-      console.log("Categories z app.js: "+this.state.categories);
+
     });
   }
 
@@ -109,7 +112,7 @@ class HigherOrderComponent extends React.Component {
     this.setState({
       tags: arr
     }, () => {
-      console.log("Tags z app.js: "+this.state.tags);
+
     });
   }
 
@@ -121,7 +124,7 @@ class HigherOrderComponent extends React.Component {
       <ReactNotification />
       <Sidebar visible={this.state.showSidebar} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories} updateAreas={this.updateAreas} updateCategories={this.updateCategories} updateTags={this.updateTags}/>
       <Container maxWidth="lg">
-        <NavBar search={this.doSearch} buttonOnclick={this.changeSidebarVisibility}/>
+        <NavBar search={this.doSearch} buttonOnclick={this.changeSidebarVisibility} updateMealsState={this.updateMealsState}/>
         <Meals callback={this.getMealsInfo} searchResult={this.state.searchResult} hideFavIcons={this.state.showSidebar} className={clsx(classes.content,{[classes.contentShift]: this.state.showSidebar,})} areas={this.state.areas} tags={this.state.tags} categories={this.state.categories}/>
       </Container>
     </div>
