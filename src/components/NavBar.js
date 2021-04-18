@@ -207,7 +207,6 @@ class NavBar extends Component {
             this.setState({
                 favoritesWidth: favoritesWidth,
             });
-            console.log(this.state.favoritesWidth);
         }
     }
 
